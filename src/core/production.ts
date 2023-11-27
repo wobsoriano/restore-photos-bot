@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import createDebug from 'debug';
 import { Context, Telegraf } from 'telegraf';
-// import { Update } from 'telegraf/typings/core/types/typegram';
+import { Update } from 'telegraf/typings/core/types/typegram';
 
 const debug = createDebug('bot:dev');
 
@@ -11,7 +11,7 @@ const VERCEL_URL = `${process.env.VERCEL_URL}`;
 const production = async (
   req: VercelRequest,
   res: VercelResponse,
-  bot: Telegraf<Context<any>>
+  bot: Telegraf<Context<Update>>
 ) => {
   debug('Bot runs in production mode');
   debug(`setting webhook: ${VERCEL_URL}`);
@@ -29,7 +29,7 @@ const production = async (
   }
 
   if (req.method === 'POST') {
-    await bot.handleUpdate(req.body as unknown as any, res);
+    await bot.handleUpdate(req.body as unknown as Update, res);
   } else {
     res.status(200).json('Listening to bot events...');
   }
