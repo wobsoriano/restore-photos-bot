@@ -17,7 +17,7 @@ bot.use(session());
 bot.use(stage.middleware());
 
 // @ts-expect-error: TODO: missing scene type
-bot.command('start', (ctx) => ctx.scene.enter('ai-wizard'));
+bot.command('start', (ctx) => ctx.scene.enter('restore-photo-wizard'));
 
 // bot.command('pay', (ctx) => {
 //   ctx.sendInvoice()
