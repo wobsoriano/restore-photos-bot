@@ -1,10 +1,5 @@
 import { Composer, Markup, Scenes } from 'telegraf';
-
-import Replicate from 'replicate';
-
-const replicate = new Replicate({
-	auth: process.env.REPLICATE_API_TOKEN,
-});
+import { deblur, deoldifyImage, faceRestoration } from '../models';
 
 interface RestorePhotoWizardSession extends Scenes.WizardSessionData {
 	mode: 'face_restoration' | 'colorize' | 'deblur';
@@ -14,6 +9,11 @@ export type RestorePhotoContext =
 	Scenes.WizardContext<RestorePhotoWizardSession>;
 
 const stepHandler = new Composer<RestorePhotoContext>();
+
+stepHandler.action('add_credits', async (ctx) => {
+	await ctx.reply('Open payment window');
+	return ctx.wizard.next();
+});
 
 stepHandler.action('face_restoration', async (ctx) => {
 	ctx.scene.session.mode = 'face_restoration';
@@ -40,6 +40,7 @@ export const restorePhotoWizard = new Scenes.WizardScene(
 			'What do you want to do today?',
 			Markup.inlineKeyboard(
 				[
+					Markup.button.callback('Add credits to my account', 'add_credits'),
 					Markup.button.callback('Face restoration', 'face_restoration'),
 					Markup.button.callback('Colorize photo', 'colorize'),
 					Markup.button.callback('Deblur photo', 'deblur'),
@@ -96,47 +97,3 @@ export const restorePhotoWizard = new Scenes.WizardScene(
 		return ctx.scene.leave();
 	},
 );
-
-// Models
-
-async function deoldifyImage(url: string): Promise<string> {
-	return await runReplicateModel(
-		'arielreplicate/deoldify_image:0da600fab0c45a66211339f1c16b71345d22f26ef5fea3dca1bb90bb5711e950',
-		{
-			input_image: url,
-			model_name: 'Artistic',
-		},
-	);
-}
-
-async function faceRestoration(url: string): Promise<string> {
-	return await runReplicateModel(
-		'tencentarc/gfpgan:9283608cc6b7be6b65a8e44983db012355fde4132009bf99d976b2f0896856a3',
-		{
-			img: url,
-			scale: 2,
-			version: 'v1.4',
-		},
-	);
-}
-
-async function deblur(url: string): Promise<string> {
-	return await runReplicateModel(
-		'megvii-research/nafnet:018241a6c880319404eaa2714b764313e27e11f950a7ff0a7b5b37b27b74dcf7',
-		{
-			image: url,
-			task_type: 'Image Debluring (REDS)',
-		},
-	);
-}
-
-async function runReplicateModel(
-	model: `${string}/${string}:${string}`,
-	input: Record<string, string | number>,
-): Promise<string> {
-	const output = await replicate.run(model, {
-		input,
-	});
-
-	return output as unknown as string;
-}

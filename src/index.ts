@@ -4,7 +4,7 @@ import { development, production } from './core';
 
 import { RestorePhotoContext, restorePhotoWizard } from './wizards';
 
-const bot = new Telegraf(process.env.BOT_TOKEN as string);
+const bot = new Telegraf<RestorePhotoContext>(process.env.BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
@@ -13,11 +13,10 @@ const stage = new Scenes.Stage<RestorePhotoContext>([restorePhotoWizard], {
 });
 
 bot.use(session());
-// @ts-expect-error: TODO: middleware incorrect type
 bot.use(stage.middleware());
 
-// @ts-expect-error: TODO: missing scene type
 bot.command('start', (ctx) => ctx.scene.enter('restore-photo-wizard'));
+bot.command('cancel', (ctx) => ctx.scene.leave());
 
 // bot.command('pay', (ctx) => {
 //   ctx.sendInvoice()
