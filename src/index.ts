@@ -6,8 +6,8 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
-bot.on('message', (ctx) => {
-  ctx.reply('Hi there')
+bot.on('message', async (ctx) => {
+  await ctx.reply('Hi there')
 });
 
 // prod mode (Vercel)
