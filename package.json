@@ -1,5 +1,5 @@
 {
-  "name": "not-hotdog-bot",
+  "name": "restore-photos-bot",
   "main": "src/index.ts",
   "scripts": {
     "dev": "DEBUG=bot* dotenv -- tsx watch src/index.ts",
