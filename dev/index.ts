@@ -4,6 +4,10 @@ import { Telegraf } from 'telegraf'
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string);
 const app = express();
 
+app.use('/api/hello', (req, res) => {
+  return res.send('Hi sir!')
+})
+
 // Set the bot API endpoint
 app.use(await bot.createWebhook({ domain: process.env.WEBHOOK_DOMAIN as string }));
 
