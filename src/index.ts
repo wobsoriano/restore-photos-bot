@@ -48,15 +48,16 @@ const superWizard = new Scenes.WizardScene(
 	},
 	stepHandler,
 	async (ctx) => {
+    // @ts-expect-error: TODO, type photo
 		if (!ctx.message?.photo?.length) {
 			await ctx.reply('Please upload a photo to continue');
-			// return await ctx.scene.leave();
 			return ctx.scene.reenter();
 		}
 
 		await ctx.reply('Processing your photo');
 
-		const { file_id: fileId } = ctx.message?.photo[2];
+    // @ts-expect-error: TODO, type photo
+		const { file_id: fileId } = ctx.message.photo[2];
 
 		const fileLink = await ctx.telegram.getFileLink(fileId);
 
@@ -101,8 +102,10 @@ const stage = new Scenes.Stage<MyContext>([superWizard], {
 });
 
 bot.use(session());
+// @ts-expect-error: TODO: middleware incorrect type
 bot.use(stage.middleware());
 
+// @ts-expect-error: TODO: missing scene type
 bot.command('start', (ctx) => ctx.scene.enter('ai-wizard'));
 
 bot.on('message', (ctx) => ctx.reply('Try /start'));
