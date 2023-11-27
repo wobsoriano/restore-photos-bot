@@ -3,7 +3,8 @@
   "type": "module",
   "main": "index.mjs",
   "scripts": {
-    "dev": "DEBUG=bot* dotenv -- tsx watch src/index.ts"
+    "dev": "DEBUG=bot* dotenv -- tsx watch src/index.ts",
+    "build": "ncc build src/index.ts -o public -m"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
+    "@types/node": "^20.10.0",
     "@vercel/ncc": "^0.38.1",
     "debug": "^4.3.4",
     "tsup": "^8.0.1",
