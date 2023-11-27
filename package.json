@@ -1,7 +1,6 @@
 {
   "name": "not-hotdog-bot",
-  "type": "module",
-  "main": "index.mjs",
+  "main": "index.ts",
   "scripts": {
     "dev": "DEBUG=bot* dotenv -- tsx watch src/index.ts",
     "build": "ncc build src/index.ts -o public -m"
