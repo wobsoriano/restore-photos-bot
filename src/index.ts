@@ -2,7 +2,7 @@ import { Telegraf } from 'telegraf'
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string);
+const bot = new Telegraf(process.env.BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
