@@ -73,6 +73,8 @@ const superWizard = new Scenes.WizardScene(
 				},
 			);
 
+			await ctx.sendChatAction('upload_photo');
+
 			await ctx.replyWithPhoto(output as unknown as string);
 			await ctx.reply('Photo restored. Thank you for using our service.');
 		} else {
@@ -89,7 +91,6 @@ const superWizard = new Scenes.WizardScene(
 			await ctx.sendChatAction('upload_photo');
 
 			await ctx.replyWithPhoto(output as unknown as string);
-
 			await ctx.reply('Photo colorized. Thank you for using our service.');
 		}
 
@@ -107,6 +108,10 @@ bot.use(stage.middleware());
 
 // @ts-expect-error: TODO: missing scene type
 bot.command('start', (ctx) => ctx.scene.enter('ai-wizard'));
+
+// bot.command('pay', (ctx) => {
+//   ctx.sendInvoice()
+// })
 
 bot.on('message', (ctx) => ctx.reply('Try /start'));
 
