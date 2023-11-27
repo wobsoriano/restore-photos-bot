@@ -6,9 +6,6 @@
     "build": "bun build ./dev/index.ts --outdir ./build --target node --external express --external telegraf",
     "dev": "bun run ./dev/index.ts"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "author": "Robert Soriano",
   "license": "ISC",
   "dependencies": {
