@@ -1,6 +1,5 @@
 {
   "name": "restore-photos-bot",
-  "type": "module",
   "main": "src/index.ts",
   "scripts": {
     "dev": "DEBUG=bot* dotenv -- tsx watch src/index.ts",
