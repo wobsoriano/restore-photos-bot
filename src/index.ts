@@ -8,6 +8,7 @@ const bot = new Telegraf<RestorePhotoContext>(process.env.BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
+// @ts-expect-error: TODO: Multiple wizards type
 const stage = new Scenes.Stage<RestorePhotoContext>([restorePhotoWizard, buyCreditsWizard], {
 	default: 'restore-photo-wizard',
 });
