@@ -39,7 +39,7 @@ bot.use(session());
 bot.use(stage.middleware());
 
 bot.command('start', (ctx) => ctx.scene.enter('restore-photo-wizard'));
-bot.command('cancel', (ctx) => ctx.scene.leave())
+bot.command('cancel', (ctx) => ctx.scene.enter('restore-photo-wizard'))
 bot.on('message', (ctx) => ctx.reply('Try /start'));
 
 // prod mode (Vercel)

@@ -57,6 +57,10 @@ stepHandler.action('250_credits', async (ctx) => {
 	return ctx.wizard.next();
 });
 
+stepHandler.action('cancel', async (ctx) => {
+	await ctx.scene.enter('restore-photo-wizard');
+})
+
 export const buyCreditsWizard = new Scenes.WizardScene(
 	'buy-credits-wizard',
 	async (ctx) => {
@@ -67,6 +71,7 @@ export const buyCreditsWizard = new Scenes.WizardScene(
 					Markup.button.callback('50 credits - $5', '50_credits'),
 					Markup.button.callback('100 credits - $9', '100_credits'),
 					Markup.button.callback('250 credits - $20', '250_credits'),
+					Markup.button.callback('Cancel', 'cancel'),
 				],
 				{
 					wrap: (_btn, _index, currentRow) => currentRow.length >= 1,
@@ -77,7 +82,7 @@ export const buyCreditsWizard = new Scenes.WizardScene(
 	},
 	stepHandler,
 	async (ctx) => {
-		// await ctx.reply('pay success')
-		return await ctx.scene.leave();
+		console.log('next step')
+		return ctx.scene.enter('restore-photo-wizard');
 	},
 );

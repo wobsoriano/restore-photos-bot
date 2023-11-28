@@ -24,7 +24,7 @@ async function checkIfUserHasCredits(telegramId: number) {
 
 stepHandler.action('buy_credits', async (ctx) => {
 	debug('Triggered buy_credits action')
-	return await ctx.scene.enter('buy-credits-wizard');
+	return ctx.scene.enter('buy-credits-wizard');
 });
 
 stepHandler.action('face_restoration', async (ctx) => {
@@ -32,12 +32,12 @@ stepHandler.action('face_restoration', async (ctx) => {
 	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
 	if (hasCredits) {
 		ctx.scene.session.mode = 'face_restoration';
-		await ctx.reply('Send me a photo to restore');
+		await ctx.reply('Send me a photo to restore or type /cancel to cancel');
 		return ctx.wizard.next();
 	}
 	
 	await ctx.reply('You have no credits. Please buy credits to continue');
-	return await ctx.scene.leave();
+	return ctx.scene.leave();
 });
 
 stepHandler.action('colorize', async (ctx) => {
@@ -45,7 +45,7 @@ stepHandler.action('colorize', async (ctx) => {
 	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
 	if (hasCredits) {
 		ctx.scene.session.mode = 'colorize';
-		await ctx.reply('Send me a photo to colorize');
+		await ctx.reply('Send me a photo to colorize or type /cancel to cancel');
 		return ctx.wizard.next();
 	}
 	
@@ -58,12 +58,12 @@ stepHandler.action('deblur', async (ctx) => {
 	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
 	if (hasCredits) {
 		ctx.scene.session.mode = 'deblur';
-		await ctx.reply('Send me a photo to deblur');
+		await ctx.reply('Send me a photo to deblur or type /cancel to cancel');
 		return ctx.wizard.next();
 	}
 	
 	await ctx.reply('You have no credits. Please buy credits to continue');
-	return await ctx.scene.leave();
+	return ctx.scene.leave();
 });
 
 export const restorePhotoWizard = new Scenes.WizardScene(
@@ -87,6 +87,12 @@ export const restorePhotoWizard = new Scenes.WizardScene(
 	},
 	stepHandler,
 	async (ctx) => {
+		// @ts-expect-error: TODO, type text
+		if (ctx.message?.text === '/cancel') {
+			await ctx.scene.leave();
+			return ctx.scene.enter('restore-photo-wizard');
+		}
+		
 		// @ts-expect-error: TODO, type photo
 		if (!ctx.message?.photo?.length) {
 			await ctx.reply('Please upload a photo to continue');
@@ -129,6 +135,6 @@ export const restorePhotoWizard = new Scenes.WizardScene(
 
 		await deductCredits(ctx.from?.id as number, 1);
 
-		return ctx.scene.leave();
+		return ctx.scene.enter('restore-photo-wizard');
 	},
 );
