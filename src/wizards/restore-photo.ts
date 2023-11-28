@@ -10,9 +10,8 @@ export type RestorePhotoContext =
 
 const stepHandler = new Composer<RestorePhotoContext>();
 
-stepHandler.action('add_credits', async (ctx) => {
-	await ctx.reply('Open payment window');
-	return ctx.wizard.next();
+stepHandler.action('buy_credits', async (ctx) => {
+	return await ctx.scene.enter('buy-credits-wizard')
 });
 
 stepHandler.action('face_restoration', async (ctx) => {
@@ -40,7 +39,7 @@ export const restorePhotoWizard = new Scenes.WizardScene(
 			'What do you want to do today?',
 			Markup.inlineKeyboard(
 				[
-					Markup.button.callback('Add credits to my account', 'add_credits'),
+					Markup.button.callback('Buy credits', 'buy_credits'),
 					Markup.button.callback('Face restoration', 'face_restoration'),
 					Markup.button.callback('Colorize photo', 'colorize'),
 					Markup.button.callback('Deblur photo', 'deblur'),

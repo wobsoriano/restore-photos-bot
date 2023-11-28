@@ -13,7 +13,7 @@
   "author": "Robert Soriano",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.5",
+    "@supabase/supabase-js": "^2.39.0",
     "@vercel/node": "^3.0.11",
     "dotenv-cli": "^7.3.0",
     "replicate": "^0.22.0",
