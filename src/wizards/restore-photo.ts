@@ -23,10 +23,12 @@ async function checkIfUserHasCredits(telegramId: number) {
 }
 
 stepHandler.action('buy_credits', async (ctx) => {
+	debug('Triggered buy_credits action')
 	return await ctx.scene.enter('buy-credits-wizard');
 });
 
 stepHandler.action('face_restoration', async (ctx) => {
+	debug('Triggered face_restoration action')
 	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
 	if (hasCredits) {
 		ctx.scene.session.mode = 'face_restoration';
@@ -39,6 +41,7 @@ stepHandler.action('face_restoration', async (ctx) => {
 });
 
 stepHandler.action('colorize', async (ctx) => {
+	debug('Triggered colorize action')
 	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
 	if (hasCredits) {
 		ctx.scene.session.mode = 'colorize';
@@ -51,6 +54,7 @@ stepHandler.action('colorize', async (ctx) => {
 });
 
 stepHandler.action('deblur', async (ctx) => {
+	debug('Triggered deblur action')
 	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
 	if (hasCredits) {
 		ctx.scene.session.mode = 'deblur';
@@ -65,7 +69,6 @@ stepHandler.action('deblur', async (ctx) => {
 export const restorePhotoWizard = new Scenes.WizardScene(
 	'restore-photo-wizard',
 	async (ctx) => {
-		debug('Triggered restore photo wizard')
 		await ctx.reply(
 			'What do you want to do today?',
 			Markup.inlineKeyboard(

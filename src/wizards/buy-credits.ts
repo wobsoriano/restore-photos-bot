@@ -16,6 +16,7 @@ const baseInvoice = {
 };
 
 stepHandler.action('50_credits', async (ctx) => {
+	debug('Triggered add 50_credits action')
 	await ctx.replyWithInvoice({
 		...baseInvoice,
 		title: '50 credits',
@@ -29,6 +30,7 @@ stepHandler.action('50_credits', async (ctx) => {
 });
 
 stepHandler.action('100_credits', async (ctx) => {
+	debug('Triggered add 100_credits action')
 	await ctx.replyWithInvoice({
 		...baseInvoice,
 		title: '100 credits',
@@ -42,6 +44,7 @@ stepHandler.action('100_credits', async (ctx) => {
 });
 
 stepHandler.action('250_credits', async (ctx) => {
+	debug('Triggered add 250_credits action')
 	await ctx.replyWithInvoice({
 		...baseInvoice,
 		title: '250 credits',
@@ -57,7 +60,6 @@ stepHandler.action('250_credits', async (ctx) => {
 export const buyCreditsWizard = new Scenes.WizardScene(
 	'buy-credits-wizard',
 	async (ctx) => {
-		debug('Triggered buy credits wizard')
 		await ctx.reply(
 			'Buy credits',
 			Markup.inlineKeyboard(
