@@ -1,5 +1,5 @@
 import { Composer, Markup, Scenes } from 'telegraf';
-import { deblur, deoldifyImage, faceRestoration } from '../models';
+import { deblur, deoldifyImage, faceRestoration } from '../lib/models';
 
 interface RestorePhotoWizardSession extends Scenes.WizardSessionData {
 	mode: 'face_restoration' | 'colorize' | 'deblur';
@@ -11,7 +11,7 @@ export type RestorePhotoContext =
 const stepHandler = new Composer<RestorePhotoContext>();
 
 stepHandler.action('buy_credits', async (ctx) => {
-	return await ctx.scene.enter('buy-credits-wizard')
+	return await ctx.scene.enter('buy-credits-wizard');
 });
 
 stepHandler.action('face_restoration', async (ctx) => {

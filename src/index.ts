@@ -2,20 +2,27 @@ import { Scenes, Telegraf, session } from 'telegraf';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 
-import { RestorePhotoContext, buyCreditsWizard, restorePhotoWizard } from './wizards';
+import {
+	RestorePhotoContext,
+	buyCreditsWizard,
+	restorePhotoWizard,
+} from './wizards';
 
 const bot = new Telegraf<RestorePhotoContext>(process.env.BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
-// @ts-expect-error: TODO: Multiple wizards type
-const stage = new Scenes.Stage<RestorePhotoContext>([restorePhotoWizard, buyCreditsWizard], {
-	default: 'restore-photo-wizard',
-});
+const stage = new Scenes.Stage<RestorePhotoContext>(
+	// @ts-expect-error: TODO: Multiple wizards type
+	[restorePhotoWizard, buyCreditsWizard],
+	{
+		default: 'restore-photo-wizard',
+	},
+);
 
-bot.on('pre_checkout_query', ctx => ctx.answerPreCheckoutQuery(true));
-bot.on("successful_payment", (ctx) => {
-	console.log(ctx.state)
+bot.on('pre_checkout_query', (ctx) => ctx.answerPreCheckoutQuery(true));
+bot.on('successful_payment', (ctx) => {
+	console.log(ctx.state);
 	// console.log(ctx.message)
 	// {
 	// 	message_id: 724,
@@ -44,8 +51,10 @@ bot.on("successful_payment", (ctx) => {
 });
 
 bot.use(session());
+
 bot.use(stage.middleware());
 
+bot.command('start', (ctx) => ctx.scene.enter('restore-photo-wizard'));
 bot.on('message', (ctx) => ctx.reply('Try /start'));
 
 // prod mode (Vercel)

@@ -1,8 +1,4 @@
-import Replicate from 'replicate';
-
-const replicate = new Replicate({
-	auth: process.env.REPLICATE_API_TOKEN,
-});
+import { replicate } from './replicate';
 
 export async function deoldifyImage(imageUrl: string): Promise<string> {
 	return await runReplicateModel(

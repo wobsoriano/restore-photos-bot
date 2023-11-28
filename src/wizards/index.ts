@@ -1,2 +1,2 @@
 export * from './restore-photo';
-export * from './buy-credits'
+export * from './buy-credits';
