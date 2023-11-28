@@ -9,9 +9,6 @@ const baseInvoice = {
 	photo_url:
 		'https://img.clipartfest.com/5a7f4b14461d1ab2caaa656bcee42aeb_future-me-fredo-and-pidjin-the-webcomic-time-travel-cartoon_390-240.png',
 	is_flexible: false,
-	payload: JSON.stringify({
-		coupon: 'BLACK FRIDAY',
-	}),
 	need_shipping_address: false,
 };
 
@@ -21,6 +18,9 @@ stepHandler.action('50_credits', async (ctx) => {
 		title: '50 credits',
 		description: 'Add 50 credits to your account',
 		prices: [{ label: '50 credits', amount: 500 }],
+		payload: JSON.stringify({
+			credits: 50,
+		}),
 	});
 	return ctx.wizard.next();
 });
@@ -30,7 +30,10 @@ stepHandler.action('100_credits', async (ctx) => {
 		...baseInvoice,
 		title: '100 credits',
 		description: 'Add 100 credits to your account',
-		prices: [{ label: '100 credits', amount: 1000 }],
+		prices: [{ label: '100 credits', amount: 900 }],
+		payload: JSON.stringify({
+			credits: 100,
+		}),
 	});
 	return ctx.wizard.next();
 });
@@ -40,7 +43,10 @@ stepHandler.action('250_credits', async (ctx) => {
 		...baseInvoice,
 		title: '250 credits',
 		description: 'Add 250 credits to your account',
-		prices: [{ label: '250 credits', amount: 2500 }],
+		prices: [{ label: '250 credits', amount: 2000 }],
+		payload: JSON.stringify({
+			credits: 250,
+		}),
 	});
 	return ctx.wizard.next();
 });

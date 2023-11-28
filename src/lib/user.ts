@@ -24,3 +24,27 @@ export async function addUser(telegramId: number) {
 		credits: DEFAULT_CREDITS,
 	});
 }
+
+export async function addCredits(telegramId: number, count: number) {
+	const user = await getUser(telegramId);
+	const currentCredits = user?.credits || DEFAULT_CREDITS;
+
+	await supabase
+		.from('users')
+		.update({
+			credits: currentCredits + count,
+		})
+		.eq('telegram_id', telegramId);
+}
+
+export async function deductCredits(telegramId: number, count: number) {
+	const user = await getUser(telegramId);
+	const currentCredits = user?.credits || DEFAULT_CREDITS;
+
+	await supabase
+		.from('users')
+		.update({
+			credits: currentCredits - count,
+		})
+		.eq('telegram_id', telegramId);
+}
