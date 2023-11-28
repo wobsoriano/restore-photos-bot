@@ -1,5 +1,6 @@
 import { Composer, Markup, Scenes } from 'telegraf';
 import { deblur, deoldifyImage, faceRestoration } from '../lib/models';
+import { deductCredits, getUser } from '../lib/user';
 
 interface RestorePhotoWizardSession extends Scenes.WizardSessionData {
 	mode: 'face_restoration' | 'colorize' | 'deblur';
@@ -10,26 +11,52 @@ export type RestorePhotoContext =
 
 const stepHandler = new Composer<RestorePhotoContext>();
 
+async function checkIfUserHasCredits(telegramId: number) {
+	const user = await getUser(telegramId);
+	if (user && user.credits < 1) {
+		return false
+	}
+	return true
+}
+
 stepHandler.action('buy_credits', async (ctx) => {
 	return await ctx.scene.enter('buy-credits-wizard');
 });
 
 stepHandler.action('face_restoration', async (ctx) => {
-	ctx.scene.session.mode = 'face_restoration';
-	await ctx.reply('Send me a photo to restore');
-	return ctx.wizard.next();
+	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
+	if (hasCredits) {
+		ctx.scene.session.mode = 'face_restoration';
+		await ctx.reply('Send me a photo to restore');
+		return ctx.wizard.next();
+	}
+	
+	await ctx.reply('You have no credits. Please buy credits to continue');
+	return await ctx.scene.leave();
 });
 
 stepHandler.action('colorize', async (ctx) => {
-	ctx.scene.session.mode = 'colorize';
-	await ctx.reply('Send me a photo to colorize');
-	return ctx.wizard.next();
+	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
+	if (hasCredits) {
+		ctx.scene.session.mode = 'colorize';
+		await ctx.reply('Send me a photo to colorize');
+		return ctx.wizard.next();
+	}
+	
+	await ctx.reply('You have no credits. Please buy credits to continue');
+	return await ctx.scene.leave();
 });
 
 stepHandler.action('deblur', async (ctx) => {
-	ctx.scene.session.mode = 'deblur';
-	await ctx.reply('Send me a photo to deblur');
-	return ctx.wizard.next();
+	const hasCredits = await checkIfUserHasCredits(ctx.from?.id as number);
+	if (hasCredits) {
+		ctx.scene.session.mode = 'deblur';
+		await ctx.reply('Send me a photo to deblur');
+		return ctx.wizard.next();
+	}
+	
+	await ctx.reply('You have no credits. Please buy credits to continue');
+	return await ctx.scene.leave();
 });
 
 export const restorePhotoWizard = new Scenes.WizardScene(
@@ -92,6 +119,8 @@ export const restorePhotoWizard = new Scenes.WizardScene(
 				// Handle other cases or do nothing
 				break;
 		}
+
+		await deductCredits(ctx.from?.id as number, 1);
 
 		return ctx.scene.leave();
 	},

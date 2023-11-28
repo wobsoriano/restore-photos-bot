@@ -27,7 +27,7 @@ export async function addUser(telegramId: number) {
 
 export async function addCredits(telegramId: number, count: number) {
 	const user = await getUser(telegramId);
-	const currentCredits = user?.credits || DEFAULT_CREDITS;
+	const currentCredits = user?.credits ?? DEFAULT_CREDITS;
 
 	await supabase
 		.from('users')
@@ -39,7 +39,7 @@ export async function addCredits(telegramId: number, count: number) {
 
 export async function deductCredits(telegramId: number, count: number) {
 	const user = await getUser(telegramId);
-	const currentCredits = user?.credits || DEFAULT_CREDITS;
+	const currentCredits = user?.credits ?? DEFAULT_CREDITS;
 
 	await supabase
 		.from('users')
