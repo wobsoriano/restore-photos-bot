@@ -1,6 +1,9 @@
 import { Composer, Markup, Scenes } from 'telegraf';
+import createDebug from 'debug';
 import { deblur, deoldifyImage, faceRestoration } from '../lib/models';
 import { deductCredits, getUser } from '../lib/user';
+
+const debug = createDebug('bot:restore_photo');
 
 interface RestorePhotoWizardSession extends Scenes.WizardSessionData {
 	mode: 'face_restoration' | 'colorize' | 'deblur';
@@ -62,6 +65,7 @@ stepHandler.action('deblur', async (ctx) => {
 export const restorePhotoWizard = new Scenes.WizardScene(
 	'restore-photo-wizard',
 	async (ctx) => {
+		debug('Triggered restore photo wizard')
 		await ctx.reply(
 			'What do you want to do today?',
 			Markup.inlineKeyboard(

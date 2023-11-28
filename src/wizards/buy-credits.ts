@@ -1,4 +1,7 @@
 import { Composer, Markup, Scenes } from 'telegraf';
+import createDebug from 'debug';
+
+const debug = createDebug('bot:buy_credits');
 
 const stepHandler = new Composer<Scenes.WizardContext>();
 
@@ -54,6 +57,7 @@ stepHandler.action('250_credits', async (ctx) => {
 export const buyCreditsWizard = new Scenes.WizardScene(
 	'buy-credits-wizard',
 	async (ctx) => {
+		debug('Triggered buy credits wizard')
 		await ctx.reply(
 			'Buy credits',
 			Markup.inlineKeyboard(
