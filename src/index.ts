@@ -1,59 +1,61 @@
-import { Markup, Scenes, Telegraf, session } from 'telegraf';
+import { Composer, Markup, Scenes, Telegraf, session } from 'telegraf';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 import { message } from 'telegraf/filters';
 
-import { DEFAULT_CREDITS, addCredits, addUser, deductCredits, getUser } from './lib/user';
+import {
+	DEFAULT_CREDITS,
+	addCredits,
+	addUser,
+	deductCredits,
+	getUser,
+} from './lib/user';
 import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 
-const transformScene = new Scenes.BaseScene<Scenes.SceneContext>('transform');
-transformScene.enter(async (ctx) => {
-	await ctx.reply('Reply with a photo you want to fix');
-});
+const transformWizard = new Scenes.WizardScene(
+	'transform-wizard',
+	async (ctx) => {
+		await ctx.reply('Reply with a photo you want to fix');
+		return ctx.wizard.next();
+	},
+	async (ctx) => {
+		if (ctx.has(message('photo'))) {
+			const photo = ctx.message.photo[2];
 
-transformScene.on(message('photo'), async (ctx) => {
-	const { file_id: fileId } = ctx.message.photo[2];
+			const fileLink = await ctx.telegram.getFileLink(photo.file_id);
 
-	const fileLink = await ctx.telegram.getFileLink(fileId);
+			await ctx.reply('Processing your photo');
 
-	await ctx.reply('Processing your photo');
+			let output: string;
 
-	let output: string;
+			// @ts-expect-error: TODO
+			switch (ctx.scene.state.command) {
+				case 'restore':
+					output = await faceRestoration(fileLink.href);
+					break;
+				case 'colorize':
+					output = await deoldifyImage(fileLink.href);
+					break;
+				case 'deblur':
+					output = await deblur(fileLink.href);
+					break;
+				default:
+					output = '';
+					break;
+			}
 
-	// @ts-expect-error: TODO
-	switch (ctx.scene.state.command) {
-		case 'restore':
-			output = await faceRestoration(fileLink.href);
-			break;
-		case 'colorize':
-			output = await deoldifyImage(fileLink.href);
-			break;
-		case 'deblur':
-			output = await deblur(fileLink.href);
-			break;
-		default:
-			output = '';
-			break;
-	}
+			await ctx.sendChatAction('upload_photo');
+			await ctx.replyWithPhoto(output);
+			await deductCredits(ctx.from.id, 1);
 
-	await ctx.sendChatAction('upload_photo');
-	await ctx.replyWithPhoto(output);
-	await deductCredits(ctx.from.id, 1);
-	await ctx.scene.leave();
-});
+			return ctx.scene.leave();
+		}
 
-transformScene.on('message', async (ctx) => {
-	await ctx.reply(
-		`I'm waiting for a photo. If you wish to cancel, type /cancel`,
-	);
-});
+		await ctx.reply('I need a photo to work with');
+	},
+);
 
-transformScene.command('cancel', async (ctx) => {
-	await ctx.reply('Cancelled');
-	await ctx.scene.leave();
-});
-
-const bot = new Telegraf<Scenes.SceneContext>(process.env.BOT_TOKEN as string);
+const bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
@@ -128,7 +130,8 @@ bot.command('buy', async (ctx) => {
 	);
 });
 
-const stage = new Scenes.Stage<Scenes.SceneContext>([transformScene], {
+// @ts-expect-error: TODO
+const stage = new Scenes.Stage<Scenes.WizardContext>([transformWizard], {
 	ttl: 10,
 });
 
@@ -148,7 +151,7 @@ bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
 		return;
 	}
 
-	ctx.scene.enter('transform', {
+	ctx.scene.enter('transform-wizard', {
 		command: ctx.command,
 	});
 });
