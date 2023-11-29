@@ -1,4 +1,4 @@
-import { Context, Markup, Telegraf, session } from 'telegraf';
+import { Markup, Scenes, Telegraf, session } from 'telegraf';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 import { message } from 'telegraf/filters';
@@ -6,21 +6,55 @@ import { message } from 'telegraf/filters';
 import { addCredits, addUser, deductCredits, getUser } from './lib/user';
 import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 
-type TransformType = 'restore' | 'colorize' | 'deblur';
-
 const DEFAULT_CREDITS = 5;
 
-interface SessionData {
-	pendingTransformations: {
-		[key: number]: TransformType;
-	};
-}
+const transformScene = new Scenes.BaseScene<Scenes.SceneContext>('transform');
+transformScene.enter(async (ctx) => {
+	await ctx.reply('Reply with a photo you want to fix');
+});
 
-export interface MyContext extends Context {
-	session?: SessionData;
-}
+transformScene.on(message('photo'), async (ctx) => {
+	const { file_id: fileId } = ctx.message.photo[2];
 
-const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN as string);
+	const fileLink = await ctx.telegram.getFileLink(fileId);
+
+	await ctx.reply('Processing your photo');
+
+	let output: string;
+
+	// @ts-expect-error: TODO
+	switch (ctx.scene.state.command) {
+		case 'restore':
+			output = await faceRestoration(fileLink.href);
+			break;
+		case 'colorize':
+			output = await deoldifyImage(fileLink.href);
+			break;
+		case 'deblur':
+			output = await deblur(fileLink.href);
+			break;
+		default:
+			output = '';
+			break;
+	}
+
+	await ctx.sendChatAction('upload_photo');
+	await ctx.replyWithPhoto(output);
+	await ctx.scene.leave();
+});
+
+transformScene.on('message', async (ctx) => {
+	await ctx.reply(
+		`I'm waiting for a photo. If you wish to cancel, type /cancel`,
+	);
+});
+
+transformScene.command('cancel', async (ctx) => {
+	await ctx.reply('Cancelled');
+	await ctx.scene.leave();
+});
+
+const bot = new Telegraf<Scenes.SceneContext>(process.env.BOT_TOKEN as string);
 
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
@@ -95,23 +129,13 @@ bot.command('buy', async (ctx) => {
 	);
 });
 
+const stage = new Scenes.Stage<Scenes.SceneContext>([transformScene], {
+	ttl: 10,
+});
+
+bot.use(stage.middleware());
+
 bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
-	let command: TransformType;
-
-	switch (ctx.message.text) {
-		case '/restore':
-			command = 'restore';
-			break;
-		case '/deblur':
-			command = 'deblur';
-			break;
-		case '/colorize':
-			command = 'colorize';
-			break;
-		default:
-			throw new Error('Invalid command');
-	}
-
 	let user = await getUser(ctx.from?.id as number);
 
 	if (!user) {
@@ -125,60 +149,9 @@ bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
 		return;
 	}
 
-	const { message_id } = await ctx.reply(`Reply to this message with a photo to ${command}`, {
-		reply_markup: {
-			force_reply: true,
-		},
+	ctx.scene.enter('transform', {
+		command: ctx.command,
 	});
-
-	if (ctx.session) {
-		ctx.session.pendingTransformations ??= {};
-		ctx.session.pendingTransformations[message_id] = command;
-	} else {
-		ctx.session = {
-			pendingTransformations: {
-				[message_id]: command,
-			},
-		};
-	}
-});
-
-bot.on(message('photo'), async (ctx) => {
-	if (ctx.message.reply_to_message) {
-		const { message_id } = ctx.message.reply_to_message;
-
-		const transformType = ctx.session?.pendingTransformations?.[message_id];
-		if (transformType) {
-			await ctx.reply('Processing your photo');
-
-			const { file_id: fileId } = ctx.message.photo[2];
-
-			const fileLink = await ctx.telegram.getFileLink(fileId);
-
-			let output: string;
-
-			switch (transformType) {
-				case 'restore':
-					output = await faceRestoration(fileLink.href);
-					break;
-				case 'colorize':
-					output = await deoldifyImage(fileLink.href);
-					break;
-				case 'deblur':
-					output = await deblur(fileLink.href);
-					break;
-				default:
-					output = '';
-					break;
-			}
-
-			await ctx.sendChatAction('upload_photo');
-			await ctx.replyWithPhoto(output);
-			await deductCredits(ctx.from.id, 1);
-
-			delete ctx.session?.pendingTransformations?.[message_id];
-		}
-	}
 });
 
 bot.command('credits', async (ctx) => {
