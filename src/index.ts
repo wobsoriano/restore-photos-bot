@@ -8,6 +8,8 @@ import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 
 type TransformType = 'restore' | 'colorize' | 'deblur';
 
+const DEFAULT_CREDITS = 5
+
 interface SessionData {
 	pendingTransformations: {
 		[key: number]: TransformType;
@@ -31,6 +33,10 @@ bot.telegram.setMyCommands([
 	{ command: 'restore', description: 'Restore the faces in old photographs.' },
 	{ command: 'colorize', description: 'Enhance old images by adding color.' },
 	{ command: 'deblur', description: 'Remove blurriness from an image.' },
+	{
+		command: 'credits',
+		description: 'Check how many credits you have left.',
+	},
 ]);
 
 bot.use(session());
@@ -174,6 +180,12 @@ bot.on(message('photo'), async (ctx) => {
 		}
 	}
 });
+
+bot.command('credits', async (ctx) => {
+	const user = await getUser(ctx.from.id);
+
+	await ctx.reply(`You have ${user?.credits ?? DEFAULT_CREDITS} credits left.`);
+})
 
 bot.command('start', async (ctx) => {
 	const commands = await bot.telegram.getMyCommands()
