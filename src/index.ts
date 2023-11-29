@@ -23,7 +23,7 @@ const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN as string);
 const ENVIRONMENT = process.env.NODE_ENV || '';
 
 bot.telegram.setMyCommands([
-	// { command: 'start', description: 'Start the bot' },
+	{ command: 'start', description: 'List all available commands.' },
 	{
 		command: 'buy',
 		description: 'Add credits to your account. 1 credit = 1 transformation.',
@@ -174,6 +174,15 @@ bot.on(message('photo'), async (ctx) => {
 		}
 	}
 });
+
+bot.command('start', async (ctx) => {
+	const commands = await bot.telegram.getMyCommands()
+	let formattedCommands = 'Available Commands:\n\n';
+  for (const command of commands) {
+		formattedCommands += `Command: /${command.command}\nDescription: ${command.description}\n\n`;
+	}
+	await ctx.reply(formattedCommands);
+})
 
 // prod mode (Vercel)
 export const startVercel = async (req: VercelRequest, res: VercelResponse) => {
