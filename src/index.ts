@@ -140,9 +140,7 @@ bot.command('buy', async (ctx) => {
 });
 
 // @ts-expect-error: TODO
-const stage = new Scenes.Stage<Scenes.WizardContext>([transformWizard], {
-	ttl: 60,
-});
+const stage = new Scenes.Stage<Scenes.WizardContext>([transformWizard]);
 
 bot.use(stage.middleware());
 
