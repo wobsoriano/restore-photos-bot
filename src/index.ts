@@ -40,6 +40,7 @@ transformScene.on(message('photo'), async (ctx) => {
 
 	await ctx.sendChatAction('upload_photo');
 	await ctx.replyWithPhoto(output);
+	await deductCredits(ctx.from.id, 1);
 	await ctx.scene.leave();
 });
 
