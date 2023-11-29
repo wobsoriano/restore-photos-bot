@@ -3,10 +3,8 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 import { message } from 'telegraf/filters';
 
-import { addCredits, addUser, deductCredits, getUser } from './lib/user';
+import { DEFAULT_CREDITS, addCredits, addUser, deductCredits, getUser } from './lib/user';
 import { deblur, deoldifyImage, faceRestoration } from './lib/models';
-
-const DEFAULT_CREDITS = 5;
 
 const transformScene = new Scenes.BaseScene<Scenes.SceneContext>('transform');
 transformScene.enter(async (ctx) => {

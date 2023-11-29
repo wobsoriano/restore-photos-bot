@@ -7,7 +7,7 @@ interface User {
 	created_at: string;
 }
 
-const DEFAULT_CREDITS = 5;
+export const DEFAULT_CREDITS = 5;
 
 export async function getUser(telegramId: number): Promise<User | null> {
 	const { data: record } = await supabase
