@@ -96,25 +96,6 @@ bot.command('buy', async (ctx) => {
 });
 
 bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
-	let user = await getUser(ctx.from?.id as number);
-
-	if (!user) {
-		user = await addUser(ctx.from.id);
-	}
-
-	if (user && user.credits < 1) {
-		await ctx.reply(
-			"You don't have enough credits to perform this transformation. Buy more credits with /buy",
-		);
-		return;
-	}
-
-	const { message_id } = await ctx.reply('Reply with a photo to restore', {
-		reply_markup: {
-			force_reply: true,
-		},
-	});
-
 	let command: TransformType;
 
 	switch (ctx.message.text) {
@@ -130,6 +111,25 @@ bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
 		default:
 			throw new Error('Invalid command');
 	}
+
+	let user = await getUser(ctx.from?.id as number);
+
+	if (!user) {
+		user = await addUser(ctx.from.id);
+	}
+
+	if (user && user.credits < 1) {
+		await ctx.reply(
+			"You don't have enough credits to perform this transformation. Buy more credits with /buy",
+		);
+		return;
+	}
+
+	const { message_id } = await ctx.reply(`Reply to this message with a photo to ${command}`, {
+		reply_markup: {
+			force_reply: true,
+		},
+	});
 
 	if (ctx.session) {
 		ctx.session.pendingTransformations ??= {};
