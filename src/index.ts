@@ -84,8 +84,7 @@ bot.telegram.setMyCommands([
 ]);
 
 bot.telegram.setMyDescription(`
-Do you have cherished old photos that have lost their luster over time? Or perhaps you've stumbled upon vintage black and white images that you'd like to bring to life in vibrant color?
-Look no further! Restore Photos Bot is here to help you restore, add colors, and deblur your precious memories.
+Restore Photos Bot is here to help you restore, add colors, and deblur your precious memories.
 
 dev @puppypopper
 `);
