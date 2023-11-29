@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 import { message } from 'telegraf/filters';
 
-import { addCredits, addUser, getUser } from './lib/user';
+import { addCredits, addUser, deductCredits, getUser } from './lib/user';
 import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 
 type TransformType = 'restore' | 'colorize' | 'deblur';
@@ -168,6 +168,9 @@ bot.on(message('photo'), async (ctx) => {
 
 			await ctx.sendChatAction('upload_photo');
 			await ctx.replyWithPhoto(output);
+			await deductCredits(ctx.from.id, 1);
+
+			delete ctx.session?.pendingTransformations?.[message_id]
 		}
 	}
 });
