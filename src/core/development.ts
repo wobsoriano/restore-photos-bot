@@ -1,10 +1,10 @@
 import { Telegraf } from 'telegraf';
 import createDebug from 'debug';
-import { RestorePhotoContext } from '../wizards';
+import { MyContext } from '..';
 
 const debug = createDebug('bot:dev');
 
-const development = async (bot: Telegraf<RestorePhotoContext>) => {
+const development = async (bot: Telegraf<MyContext>) => {
 	const botInfo = (await bot.telegram.getMe()).username;
 
 	debug('Bot runs in development mode');
