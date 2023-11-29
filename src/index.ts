@@ -8,7 +8,7 @@ import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 
 type TransformType = 'restore' | 'colorize' | 'deblur';
 
-const DEFAULT_CREDITS = 5
+const DEFAULT_CREDITS = 5;
 
 interface SessionData {
 	pendingTransformations: {
@@ -26,13 +26,13 @@ const ENVIRONMENT = process.env.NODE_ENV || '';
 
 bot.telegram.setMyCommands([
 	{ command: 'start', description: 'List all available commands.' },
+	{ command: 'restore', description: 'Restore the faces in old photographs.' },
+	{ command: 'colorize', description: 'Enhance old images by adding color.' },
+	{ command: 'deblur', description: 'Remove blurriness from an image.' },
 	{
 		command: 'buy',
 		description: 'Add credits to your account. 1 credit = 1 transformation.',
 	},
-	{ command: 'restore', description: 'Restore the faces in old photographs.' },
-	{ command: 'colorize', description: 'Enhance old images by adding color.' },
-	{ command: 'deblur', description: 'Remove blurriness from an image.' },
 	{
 		command: 'credits',
 		description: 'Check how many credits you have left.',
@@ -101,10 +101,10 @@ bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
 	if (!user) {
 		user = await addUser(ctx.from.id);
 	}
-	
+
 	if (user && user.credits < 1) {
 		await ctx.reply(
-			'You don\'t have enough credits to perform this transformation. Buy more credits with /buy',
+			"You don't have enough credits to perform this transformation. Buy more credits with /buy",
 		);
 		return;
 	}
@@ -176,7 +176,7 @@ bot.on(message('photo'), async (ctx) => {
 			await ctx.replyWithPhoto(output);
 			await deductCredits(ctx.from.id, 1);
 
-			delete ctx.session?.pendingTransformations?.[message_id]
+			delete ctx.session?.pendingTransformations?.[message_id];
 		}
 	}
 });
@@ -185,16 +185,16 @@ bot.command('credits', async (ctx) => {
 	const user = await getUser(ctx.from.id);
 
 	await ctx.reply(`You have ${user?.credits ?? DEFAULT_CREDITS} credits left.`);
-})
+});
 
 bot.command('start', async (ctx) => {
-	const commands = await bot.telegram.getMyCommands()
+	const commands = await bot.telegram.getMyCommands();
 	let formattedCommands = 'Available Commands:\n\n';
-  for (const command of commands) {
+	for (const command of commands) {
 		formattedCommands += `Command: /${command.command}\nDescription: ${command.description}\n\n`;
 	}
 	await ctx.reply(formattedCommands);
-})
+});
 
 // prod mode (Vercel)
 export const startVercel = async (req: VercelRequest, res: VercelResponse) => {

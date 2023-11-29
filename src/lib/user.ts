@@ -26,8 +26,8 @@ export async function addUser(telegramId: number): Promise<User> {
 
 	return {
 		telegram_id: telegramId,
-		credits: 5
-	} as unknown as User
+		credits: 5,
+	} as unknown as User;
 }
 
 export async function addCredits(telegramId: number, count: number) {
