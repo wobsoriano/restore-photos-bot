@@ -18,11 +18,16 @@ export async function getUser(telegramId: number): Promise<User | null> {
 	return record?.length ? record[0] : null;
 }
 
-export async function addUser(telegramId: number) {
+export async function addUser(telegramId: number): Promise<User> {
 	await supabase.from('users').insert({
 		telegram_id: telegramId,
 		credits: DEFAULT_CREDITS,
 	});
+
+	return {
+		telegram_id: telegramId,
+		credits: 5
+	} as unknown as User
 }
 
 export async function addCredits(telegramId: number, count: number) {

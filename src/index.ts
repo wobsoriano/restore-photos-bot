@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 import { message } from 'telegraf/filters';
 
-import { addCredits } from './lib/user';
+import { addCredits, addUser, getUser } from './lib/user';
 import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 
 type TransformType = 'restore' | 'colorize' | 'deblur';
@@ -90,6 +90,19 @@ bot.command('buy', async (ctx) => {
 });
 
 bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
+	let user = await getUser(ctx.from?.id as number);
+
+	if (!user) {
+		user = await addUser(ctx.from.id);
+	}
+	
+	if (user && user.credits < 1) {
+		await ctx.reply(
+			'You don\'t have enough credits to perform this transformation. Buy more credits with /buy',
+		);
+		return;
+	}
+
 	const { message_id } = await ctx.reply('Reply with a photo to restore', {
 		reply_markup: {
 			force_reply: true,
