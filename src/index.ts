@@ -15,7 +15,9 @@ import { deblur, deoldifyImage, faceRestoration } from './lib/models';
 const transformWizard = new Scenes.WizardScene(
 	'transform-wizard',
 	async (ctx) => {
-		await ctx.reply('Reply with a photo you want to fix');
+		await ctx.reply(
+			'Reply with a photo you want to fix or type /cancel to cancel',
+		);
 		return ctx.wizard.next();
 	},
 	async (ctx) => {
@@ -51,9 +53,16 @@ const transformWizard = new Scenes.WizardScene(
 			return ctx.scene.leave();
 		}
 
-		await ctx.reply('I need a photo to work with');
+		await ctx.reply(
+			'Please reply with a photo to continue your request or type /cancel to cancel',
+		);
 	},
 );
+
+transformWizard.command('cancel', async (ctx) => {
+	await ctx.reply('Request cancelled');
+	return ctx.scene.leave();
+});
 
 const bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN as string);
 
@@ -132,7 +141,7 @@ bot.command('buy', async (ctx) => {
 
 // @ts-expect-error: TODO
 const stage = new Scenes.Stage<Scenes.WizardContext>([transformWizard], {
-	ttl: 10,
+	ttl: 60,
 });
 
 bot.use(stage.middleware());
