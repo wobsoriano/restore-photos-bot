@@ -10,7 +10,7 @@ import {
 	deductCredits,
 	getUser,
 } from './lib/user';
-import { deblur, deoldifyImage, faceRestoration } from './lib/models';
+import { deblur, deoldifyImage, faceRestoration, nightEnhancement } from './lib/models';
 
 const transformWizard = new Scenes.WizardScene(
 	'transform-wizard',
@@ -40,6 +40,9 @@ const transformWizard = new Scenes.WizardScene(
 					break;
 				case 'deblur':
 					output = await deblur(fileLink.href);
+					break;
+				case 'brighten':
+					output = await nightEnhancement(fileLink.href);
 					break;
 				default:
 					output = '';
@@ -73,6 +76,7 @@ bot.telegram.setMyCommands([
 	{ command: 'restore', description: 'Restore the faces in old photographs.' },
 	{ command: 'colorize', description: 'Enhance old images by adding color.' },
 	{ command: 'deblur', description: 'Remove blurriness from an image.' },
+	{ command: 'brighten', description: 'Night image enhancement.' },
 	{
 		command: 'buy',
 		description: 'Add credits to your account. 1 credit = 1 transformation.',
@@ -150,7 +154,7 @@ const stage = new Scenes.Stage<Scenes.WizardContext>([transformWizard]);
 
 bot.use(stage.middleware());
 
-bot.command(/^(restore|deblur|colorize)$/, async (ctx) => {
+bot.command(/^(restore|deblur|colorize|brighten)$/, async (ctx) => {
 	let user = await getUser(ctx.from?.id as number);
 
 	if (!user) {

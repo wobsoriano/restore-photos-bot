@@ -31,6 +31,15 @@ export async function deblur(imageUrl: string): Promise<string> {
 	);
 }
 
+export async function nightEnhancement(imageUrl: string): Promise<string> {
+	return await runReplicateModel(
+		'cjwbw/night-enhancement:4328e402cfedafa70ad7cec04412e86ab61832204deccd94108ae5222c9b1ae1',
+		{
+			image: imageUrl,
+		},
+	);
+}
+
 async function runReplicateModel(
 	model: `${string}/${string}:${string}`,
 	input: Record<string, string | number>,
