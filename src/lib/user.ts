@@ -40,6 +40,8 @@ export async function addCredits(telegramId: number, count: number) {
 			credits: currentCredits + count,
 		})
 		.eq('telegram_id', telegramId);
+
+	return true;
 }
 
 export async function deductCredits(telegramId: number, count: number) {
@@ -52,4 +54,6 @@ export async function deductCredits(telegramId: number, count: number) {
 			credits: currentCredits - count,
 		})
 		.eq('telegram_id', telegramId);
+
+	return true;
 }
