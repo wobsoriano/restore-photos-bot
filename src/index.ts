@@ -50,13 +50,8 @@ const transformWizard = new Scenes.WizardScene(
 			}
 
 			await ctx.sendChatAction('upload_photo');
+			await deductCredits(ctx.from.id, 1);
 			await ctx.replyWithPhoto(output);
-			
-			try {
-				await deductCredits(ctx.from.id, 1);
-			} catch (e) {
-				console.log('unable to deduct credits')
-			}
 
 			return ctx.scene.leave();
 		}
