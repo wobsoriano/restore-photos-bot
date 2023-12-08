@@ -43,6 +43,7 @@ export async function addCredits(telegramId: number, count: number) {
 }
 
 export async function deductCredits(telegramId: number, count: number) {
+	console.log('deducting credits...')
 	const user = await getUser(telegramId);
 	const currentCredits = user?.credits ?? DEFAULT_CREDITS;
 
@@ -52,4 +53,6 @@ export async function deductCredits(telegramId: number, count: number) {
 			credits: currentCredits - count,
 		})
 		.eq('telegram_id', telegramId);
+
+	console.log('credits deducted', currentCredits - count)
 }
