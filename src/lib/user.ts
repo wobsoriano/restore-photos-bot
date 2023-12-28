@@ -7,7 +7,7 @@ interface User {
 	created_at: string;
 }
 
-export const DEFAULT_CREDITS = 5;
+export const DEFAULT_CREDITS = 3;
 
 export async function getUser(telegramId: number): Promise<User | null> {
 	const { data: record } = await supabase
@@ -26,7 +26,7 @@ export async function addUser(telegramId: number): Promise<User> {
 
 	return {
 		telegram_id: telegramId,
-		credits: 5,
+		credits: DEFAULT_CREDITS,
 	} as unknown as User;
 }
 
