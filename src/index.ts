@@ -156,16 +156,16 @@ const stage = new Scenes.Stage<Scenes.WizardContext>([transformWizard]);
 bot.use(stage.middleware());
 
 bot.command(/^(restore|deblur|colorize|brighten)$/, async (ctx) => {
-	let user = await getUser(ctx.from?.id as number);
+	const user = await getUser(ctx.from?.id as number);
+	const noCreditsMessage = `You don't have enough credits to perform this transformation. Buy more credits with /buy`
 
 	if (!user) {
-		user = await addUser(ctx.from.id);
+		await ctx.reply(noCreditsMessage);
+		return
 	}
 
 	if (user && user.credits < 1) {
-		await ctx.reply(
-			"You don't have enough credits to perform this transformation. Buy more credits with /buy",
-		);
+		await ctx.reply(noCreditsMessage);
 		return;
 	}
 
