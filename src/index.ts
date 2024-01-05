@@ -1,4 +1,4 @@
-import { Composer, Markup, Scenes, Telegraf, session } from 'telegraf';
+import { Markup, Scenes, Telegraf, session } from 'telegraf';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
 import { message } from 'telegraf/filters';
